@@ -1,21 +1,22 @@
-setwd("~/Coursera Assignments/Exploratory Data Analysis/Week 1 HW")
-hp <- read.table("household_power_consumption.txt", header=TRUE, sep=";")
+setwd("H:/Coursera Data Specialization Course/Exploratory Data Analysis/HW1")
+data <- read.table("household_power_consumption.txt", header=TRUE, sep=";", stringsAsFactors=FALSE, dec=".")
 
-#Change date format for time and date variables; create one string for date/time
-hp$Date <- strptime(hp$Date, "%d/%m/%Y")
-hp$Time <- strptime(hp$Time, "%H:%M:%S")
-hp$time <- format(hp$Time, "%H:%M:%S")
-hp$Datetime <- as.POSIXct(paste(hp$Date, hp$time), format="%Y-%m-%d %H:%M:%S")
-#subset observations for a given date range
-sub <- hp[which(hp$Date=="2007-02-01" | hp$Date=="2007-02-02"),]
-#Recode variables as numeric
-sub$Sub_metering_1 <- as.numeric(sub$Sub_metering_1)
-sub$Sub_metering_2 <- as.numeric(sub$Sub_metering_2)
-sub$Sub_metering_3 <- as.numeric(sub$Sub_metering_3)
+#subset data for specific date range
+sub <- data[data$Date %in% c("1/2/2007","2/2/2007") ,]
 
-##PLOT #3
-plot(sub$Sub_metering_1~sub$Datetime, type="l", ylab="Energy sub metering", xlab="")
-lines(sub$Sub_metering_2~sub$Datetime, col="red")
-lines(sub$Sub_metering_3~sub$Datetime, col="blue")
-legend("topright", col=c("black", "red", "blue"), 
-       legend=c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
+#convert date/time variables to date/time string
+datetime <- strptime(paste(sub$Date, sub$Time, sep=" "), "%d/%m/%Y %H:%M:%S")
+
+#convert to numeric variable
+globalActivePower <- as.numeric(sub$Global_active_power)
+
+subMetering1 <- as.numeric(sub$Sub_metering_1)
+subMetering2 <- as.numeric(sub$Sub_metering_2)
+subMetering3 <- as.numeric(sub$Sub_metering_3)
+
+png("plot3.png", width=480, height=480)
+plot(datetime, subMetering1, type="l", ylab="Energy Submetering", xlab="")
+lines(datetime, subMetering2, type="l", col="red")
+lines(datetime, subMetering3, type="l", col="blue")
+legend("topright", c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), lty=1, lwd=2.5, col=c("black", "red", "blue"))
+dev.off()

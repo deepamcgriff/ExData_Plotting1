@@ -1,16 +1,9 @@
-setwd("~/Coursera Assignments/Exploratory Data Analysis/Week 1 HW")
-hp <- read.table("household_power_consumption.txt", header=TRUE, sep=";")
-
-#Change date format for time and date variables; create one string for date/time
-hp$Date <- strptime(hp$Date, "%d/%m/%Y")
-hp$Time <- strptime(hp$Time, "%H:%M:%S")
-hp$time <- format(hp$Time, "%H:%M:%S")
-hp$Datetime <- as.POSIXct(paste(hp$Date, hp$time), format="%Y-%m-%d %H:%M:%S")
-#subset observations for a given date range
-sub <- hp[which(hp$Date=="2007-02-01" | hp$Date=="2007-02-02"),]
-#Recode variable as numeric; transform into kW
-sub$Global_active_power = as.numeric(sub$Global_active_power)
-sub$gakw <- sub$Global_active_power/1000
-##PLOT 1
-hist(sub$gakw, main="Global Active Power", xlab="Global Active Power (kilowatts)", 
-     ylab="Frequency", col="red", breaks=15, xlim=c(0,6))
+setwd("H:/Coursera Data Specialization Course/Exploratory Data Analysis/HW1")
+data <- read.table("household_power_consumption.txt", header=TRUE, sep=";", stringsAsFactors=FALSE, dec=".")
+#subset data for specific date range
+sub <- data[data$Date %in% c("1/2/2007","2/2/2007") ,]
+#convert to numeric variable
+globalActivePower <- as.numeric(sub$Global_active_power)
+png("plot1.png", width=480, height=480)
+hist(globalActivePower, col="red", main="Global Active Power", xlab="Global Active Power (kilowatts)")
+dev.off()

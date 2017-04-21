@@ -1,31 +1,33 @@
-setwd("~/Coursera Assignments/Exploratory Data Analysis/Week 1 HW")
-#Read in text file
-hp <- read.table("household_power_consumption.txt", header=TRUE, sep=";")
-#Convert time/date fields to date format and create one variable for 
-##date/time
+setwd("H:/Coursera Data Specialization Course/Exploratory Data Analysis/HW1")
+data <- read.table("household_power_consumption.txt", header=TRUE, sep=";", stringsAsFactors=FALSE, dec=".")
 
-hp$Date <- strptime(hp$Date, "%d/%m/%Y")
-hp$Time <- strptime(hp$Time, "%H:%M:%S")
-hp$time <- format(hp$Time, "%H:%M:%S")
-hp$Datetime <- as.POSIXct(paste(hp$Date, hp$time), format="%Y-%m-%d %H:%M:%S")
-sub <- hp[which(hp$Date=="2007-02-01" | hp$Date=="2007-02-02"),]
-#Recode relevant variables as numeric
-sub$Global_active_power = as.numeric(sub$Global_active_power)
-sub$gakw <- sub$Global_active_power/1000 #convert to kW
-sub$Voltage = as.numeric(sub$Voltage)
-sub$Global_reactive_power = as.numeric(sub$Global_reactive_power)
+#subset data for specific date range
+sub <- data[data$Date %in% c("1/2/2007","2/2/2007") ,]
 
-par(mfrow=c(2,2))
-##Number 1
-plot(sub$gakw ~ sub$Datetime, 
-     ylab="Global Active Power (kilowatts)", xlab="", type="l", ylim=c(0,6))
-##Number 2
-plot(sub$Voltage ~ sub$Datetime, type="l", xlab="datetime", ylab="Voltage")
-##Number 3
-plot(sub$Sub_metering_1~sub$Datetime, type="l", ylab="Energy sub metering", xlab="")
-lines(sub$Sub_metering_2~sub$Datetime, col="red")
-lines(sub$Sub_metering_3~sub$Datetime, col="blue")
-legend("topright", col=c("black", "red", "blue"), 
-       legend=c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
-##Number 4
-plot(sub$Global_reactive_power ~ sub$Datetime, type="l", xlab="datetime", ylab="Global_reactive_power")
+#convert date/time variables to date/time string
+datetime <- strptime(paste(sub$Date, sub$Time, sep=" "), "%d/%m/%Y %H:%M:%S")
+
+#convert to numeric variable
+globalActivePower <- as.numeric(sub$Global_active_power)
+globalReactivePower <- as.numeric(sub$Global_reactive_power)
+voltage <- as.numeric(sub$Voltage)
+
+subMetering1 <- as.numeric(sub$Sub_metering_1)
+subMetering2 <- as.numeric(sub$Sub_metering_2)
+subMetering3 <- as.numeric(sub$Sub_metering_3)
+
+png("plot4.png", width=480, height=480)
+par(mfrow = c(2, 2)) 
+
+plot(datetime, globalActivePower, type="l", xlab="", ylab="Global Active Power", cex=0.2)
+
+plot(datetime, voltage, type="l", xlab="datetime", ylab="Voltage")
+
+plot(datetime, subMetering1, type="l", ylab="Energy Submetering", xlab="")
+lines(datetime, subMetering2, type="l", col="red")
+lines(datetime, subMetering3, type="l", col="blue")
+legend("topright", c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), lty=, lwd=2.5, col=c("black", "red", "blue"), bty="o")
+
+plot(datetime, globalReactivePower, type="l", xlab="datetime", ylab="Global_reactive_power")
+
+dev.off()
